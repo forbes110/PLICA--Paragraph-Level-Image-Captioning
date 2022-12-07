@@ -1,0 +1,4 @@
+torch
+huggingface
+requests
+scikit-learn
