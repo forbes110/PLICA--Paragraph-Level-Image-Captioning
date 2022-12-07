@@ -15,7 +15,7 @@
         There is people walking in front of the building. There is a street in front of the building with many cars on it."å
     }
 
-    set the 
+    to load & set data
 
 '''
 import json
