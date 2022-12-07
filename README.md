@@ -2,5 +2,6 @@
 
 load & preprocess:
 
-``shell
+```shell
 bash ./scripts/download.sh
+```
