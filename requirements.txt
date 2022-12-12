@@ -1,4 +1,9 @@
-torch
+# Specify torch cuda version. (For RTX30 series)
+--extra-index-url https://download.pytorch.org/whl/cu113
+
+# Required package.
+torch==1.10.2+cu113
+datasets
 transformers
 requests
 scikit-learn
