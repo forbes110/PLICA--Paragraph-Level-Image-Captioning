@@ -1,4 +1,4 @@
-# ADL-FInal-Project
+# ADL-Final-Project
 
 load & preprocess:
 
