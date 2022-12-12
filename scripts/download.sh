@@ -9,4 +9,5 @@ if [ ! -f all_paragraphs.zip ]; then
     unzip all_paragraphs.zip -d ./data/raw
 fi
 
+## process data
 python3 set_data.py
