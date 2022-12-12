@@ -1,4 +1,4 @@
 torch
-huggingface
+transformers
 requests
 scikit-learn
