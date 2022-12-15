@@ -3,7 +3,11 @@ from tqdm.auto import tqdm
 import torch
 from datasets import load_dataset
 
+
 def save_preds(epoch, pr_list):
+    '''
+        save preds/refs to compare
+    '''
     with open(f"./cache/preds_e{epoch+1}.csv", "w") as fp:
         writer = csv.writer(fp)
         writer.writerow(['id', 'predictions', 'references'])
@@ -14,6 +18,9 @@ def save_preds(epoch, pr_list):
 
 
 def train_per_epoch(model, optimizer, grad_accum_epoches, train_dataloader):
+    '''
+        for each batch rounds in a epoch
+    '''
     train_loss = 0
 
     train_bar = tqdm(train_dataloader, total=len(train_dataloader), position=0, leave=True, ncols=100)
@@ -55,6 +62,9 @@ def valid_per_epoch(model, optimizer, batch_size, valid_dataloader, metric, gen_
 
 
 def load_raw_datasets(args):
+    '''
+        load train/valid/test datasets
+    '''
     if args.dataset_name is not None:
         ## Downloading and loading a dataset from the hub.
         # dataset = load_dataset("maderix/flickr_bw_rgb")

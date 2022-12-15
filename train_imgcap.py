@@ -17,9 +17,6 @@ from utils.train_utils import (
     valid_per_epoch,
     load_raw_datasets
 )
-
-import csv
-
 os.environ['CUDA_VISIBLE_DEVICES'] = '2'
 
 
@@ -28,7 +25,12 @@ os.environ['CUDA_VISIBLE_DEVICES'] = '2'
 '''
 args = parse_args()
 
+
+
 def training(train_dataloader, valid_dataloader):
+    '''
+        main function of train
+    '''
     iteration = args.num_epoches
     grad_accum_epoches = 8
     model = ImgCapModel()

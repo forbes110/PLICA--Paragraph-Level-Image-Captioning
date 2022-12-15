@@ -22,7 +22,9 @@ def parse_args() -> Namespace:
     parser.add_argument(
         "--batch_size", default=4, type=int
     )
-
+    parser.add_argument(
+        "--num_epoches", default=10, type=int
+    )
 
 
     args = parser.parse_args()
