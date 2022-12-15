@@ -11,7 +11,7 @@ import evaluate
 
 from models.ImgCapModel import ImgCapModel
 from utils.ImgCapDataset import ImgCapDataset
-from utils.utils import (
+from utils.train_utils import (
     save_preds,
     train_per_epoch,
     valid_per_epoch,
@@ -117,7 +117,6 @@ def main():
 
     " load data "
     raw_datasets = load_raw_datasets(args)
-
 
     " dataset and dataloader"
     train_dataset, valid_dataset = ImgCapDataset(raw_datasets["train"]), ImgCapDataset(raw_datasets["valid"])
