@@ -24,7 +24,7 @@ os.environ['CUDA_VISIBLE_DEVICES'] = '2'
 args = parse_args()
 
 
-def train_per_epoch(model, optimizer, batch_size, train_dataloader):
+def train_per_epoch(model, optimizer, grad_accum_epoches, train_dataloader):
     train_loss = 0
 
     train_bar = tqdm(train_dataloader, total=len(train_dataloader), position=0, leave=True, ncols=100)
@@ -37,7 +37,7 @@ def train_per_epoch(model, optimizer, batch_size, train_dataloader):
         train_loss += loss.item()
         loss.backward()
 
-        if ((idx+1) % batch_size == 0):
+        if ((idx+1) % grad_accum_epoches == 0):
             optimizer.step()
             optimizer.zero_grad()
 
@@ -74,16 +74,9 @@ def valid_per_epoch(model, optimizer, batch_size, valid_dataloader, metric):
 
         return predictions, references, metric
 
-        
-
-
-
-
-
-
-def training(train_dataloader, val_dataloader):
-    iteration = 10
-    batch_size = 8
+def training(train_dataloader, valid_dataloader):
+    iteration = args.num_epoches
+    grad_accum_epoches = 8
     model = ImgCapModel()
 
     optimizer = Adafactor(
@@ -117,10 +110,9 @@ def training(train_dataloader, val_dataloader):
         train_loss = train_per_epoch(
             model, 
             optimizer, 
-            batch_size, 
+            grad_accum_epoches, 
             train_dataloader
         )
-        
 
         " valid "
         print("---Validation---")
@@ -130,8 +122,8 @@ def training(train_dataloader, val_dataloader):
         predictions, references, metric = valid_per_epoch(
             model, 
             optimizer, 
-            batch_size, 
-            train_dataloader,
+            grad_accum_epoches, 
+            valid_dataloader,
             metric
         )
 
@@ -155,9 +147,6 @@ def training(train_dataloader, val_dataloader):
                 writer.writerow([pred, ref])
             print(f"prediction of validation set saved in ./cache/preds_{epoch}.csv!") 
 
-
-
-
         ## save and check
         model_path = os.path.join(
             "test/", "model_{}".format(epoch + 1))
@@ -165,9 +154,6 @@ def training(train_dataloader, val_dataloader):
 
         print("time:{}, epoch:{}/{}, train_loss:{}".format(
             time.time()-start_time, epoch+1, iteration, train_loss))
-
-        
-
 
 def main():
     " load data "
