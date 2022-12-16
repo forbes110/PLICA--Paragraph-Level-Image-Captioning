@@ -81,11 +81,9 @@ if __name__ == '__main__':
     parag_path = './data/raw/all_paragraphs.json'
     all_parag = load_json_file(parag_path)
 
-    # /Users/zhouchengkang/Desktop/WareHouse/ADL-FInal-Project/data/raw/all_paragraphs.json
-
     print(f' There are {len(all_parag)} data')
 
-    # ## splits
+    ## splits
     train_ids = load_json_file('./data/raw/train_split.json') 
     valid_ids = load_json_file('./data/raw/valid_split.json') 
     test_ids = load_json_file('./data/raw/test_split.json') 
@@ -95,15 +93,18 @@ if __name__ == '__main__':
         train_ids = train_ids,
         valid_ids = valid_ids,
         test_ids = test_ids,
-    )
-
-    # processed_path = './data/processed/paragraphs'
-    # save_json(Path(processed_path, 'train_file.json'), train_file)
-    # save_json(Path(processed_path, 'valid_file.json'), valid_file)
-    # save_json(Path(processed_path, 'test_file.json'), test_file)
+    )        
 
     save_json(args.train_file, train_file)
     save_json(args.valid_file, valid_file)
     save_json(args.test_file, test_file)
     print('processed files saved!')
+
+
+
+
+
+
+
+
 

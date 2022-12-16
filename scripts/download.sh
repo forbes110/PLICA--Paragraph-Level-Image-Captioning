@@ -9,5 +9,13 @@ if [ ! -f all_paragraphs.zip ]; then
     unzip all_paragraphs.zip -d ./data/raw
 fi
 
-## process data
+## download processed image data
+if [ ! -f visual_genome.zip ]; then
+    wget https://www.dropbox.com/s/z7os20crg40aupb/visual_genome.zip?dl=1 -O visual_genome.zip
+    unzip -j visual_genome.zip -d ./data/processed/img
+fi
+
+## process paragraph data
 python3 set_data.py
+
+
