@@ -30,7 +30,8 @@ class ImgCapModel(nn.Module):
     def __init__(
         self, 
         encoder_name="google/vit-base-patch16-224-in21k", 
-        decoder_name="bert-base-uncased"
+        decoder_name="bert-base-uncased",
+        gen_config=None
     ):
 
         super().__init__()
@@ -56,12 +57,15 @@ class ImgCapModel(nn.Module):
         " main model: with config, pretrained encoder, decoder "
         self.model = VisionEncoderDecoderModel.from_encoder_decoder_pretrained(
             config = config,
-            encoder = encoder_name, 
-            decoder = decoder_name
+            encoder_pretrained_model_name_or_path = encoder_name, 
+            decoder_pretrained_model_name_or_path = decoder_name
         ).to(self.device)
 
         self.model.config.decoder_start_token_id = self.tokenizer.cls_token_id
         self.model.config.pad_token_id = self.tokenizer.pad_token_id
+
+        # for generation
+        self.gen_config = gen_config
         
 
     def forward(self, image, caption=None):
@@ -82,6 +86,9 @@ class ImgCapModel(nn.Module):
 
 
     def inference(self, image):
+
+        gen_kwargs = {**self.gen_config}
+
         pixel_values = self.image_processor(
             image, return_tensors="pt").pixel_values.to(self.device)
 

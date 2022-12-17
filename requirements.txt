@@ -7,3 +7,7 @@ datasets
 transformers
 requests
 scikit-learn
+Pillow
+evaluate
+nltk
+rouge_score

@@ -9,6 +9,9 @@ def parse_args() -> Namespace:
 
     ## processed
     parser.add_argument(
+        "--dataset_name", default=None, type=str
+    )
+    parser.add_argument(
         "--train_file", default='./data/processed/paragraphs/train_file.json', type=str
     )
     parser.add_argument(

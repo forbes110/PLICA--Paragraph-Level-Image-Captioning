@@ -2,7 +2,7 @@ import csv
 from tqdm.auto import tqdm
 import torch
 from datasets import load_dataset
-
+from sklearn.model_selection import train_test_split
 
 def save_preds(epoch, pr_list):
     '''
@@ -67,8 +67,12 @@ def load_raw_datasets(args):
     '''
     if args.dataset_name is not None:
         ## Downloading and loading a dataset from the hub.
-        # dataset = load_dataset("maderix/flickr_bw_rgb")
-        raw_datasets = load_dataset(args.dataset_name, args.dataset_config_name)
+        raw_datasets = load_dataset(args.dataset_name)
+        
+        # Deal with datasets with no validation set
+        if args.dataset_name == "maderix/flickr_bw_rgb":
+            raw_datasets["valid"] = []
+
     else:
         data_files = {}
         if args.train_file is not None:

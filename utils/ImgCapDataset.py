@@ -1,7 +1,7 @@
 from torch.utils.data import DataLoader, Dataset
 import numpy as np
 
-class ImgCaptionDataset(Dataset):
+class ImgCapDataset(Dataset):
     def __init__(self, data):
         self.images = []
         self.captions = []
