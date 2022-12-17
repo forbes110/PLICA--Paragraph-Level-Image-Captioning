@@ -31,8 +31,6 @@ def training(train_dataloader, valid_dataloader):
     '''
         main function of train
     '''
-    iteration = args.num_epoches
-    grad_accum_epoches = 8
     model = ImgCapModel()
 
     optimizer = Adafactor(
@@ -55,7 +53,7 @@ def training(train_dataloader, valid_dataloader):
     ## to save results
     print("***Start training***")
 
-    for epoch in range(iteration):
+    for epoch in range(args.num_epoches):
         print(f"\n=== Epoch {epoch+1} ===")
 
         print("-----Train-----")
@@ -66,7 +64,7 @@ def training(train_dataloader, valid_dataloader):
         train_loss = train_per_epoch(
             model, 
             optimizer, 
-            grad_accum_epoches, 
+            args.grad_accu_step, 
             train_dataloader
         )
 
@@ -88,7 +86,7 @@ def training(train_dataloader, valid_dataloader):
         predictions, references, metric = valid_per_epoch(
             model, 
             optimizer, 
-            grad_accum_epoches, 
+            args.grad_accu_step, 
             valid_dataloader,
             metric,
             gen_kwargs
@@ -113,7 +111,7 @@ def training(train_dataloader, valid_dataloader):
         model.save_model(model_path)
 
         print("time:{}, epoch:{}/{}, train_loss:{}".format(
-            time.time()-start_time, epoch+1, iteration, train_loss))
+            time.time()-start_time, epoch+1, args.num_epoches, train_loss))
 
 def main():
 
@@ -121,20 +119,20 @@ def main():
     raw_datasets = load_raw_datasets(args)
 
     " dataset and dataloader"
-    train_dataset, valid_dataset = ImgCapDataset(raw_datasets["train"]), ImgCapDataset(raw_datasets["valid"])
-
+    train_dataset = ImgCapDataset(raw_datasets["train"])
     train_dataloader = DataLoader(
         train_dataset, 
         batch_size=args.batch_size,
-        collate_fn=ImgCapDataset.collate_fn
+        collate_fn=train_dataset.collate_fn
     )
 
+    valid_dataset = ImgCapDataset(raw_datasets["valid"])
     valid_dataloader = DataLoader(
         valid_dataset, 
         batch_size=args.batch_size,
-        collate_fn=ImgCapDataset.collate_fn
+        collate_fn=valid_dataset.collate_fn
     )
-
+    
     "train/valid"
     training(train_dataloader, valid_dataloader)
 

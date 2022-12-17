@@ -91,10 +91,10 @@ def main():
 
     ImgCapDataset = ImgCaptionDataset(dataset["train"])
 
-    train_data = DataLoader(ImgCapDataset, batch_size=4,
+    train_dataloader = DataLoader(ImgCapDataset, batch_size=4,
                             collate_fn=ImgCapDataset.collate_fn)
-
-    training(train_data, None)
+    
+    training(train_dataloader, None)
 
 
 if __name__ == '__main__':

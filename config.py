@@ -28,6 +28,9 @@ def parse_args() -> Namespace:
     parser.add_argument(
         "--num_epoches", default=10, type=int
     )
+    parser.add_argument(
+        "--grad_accu_step", default=8, type=int
+    )
 
 
     args = parser.parse_args()

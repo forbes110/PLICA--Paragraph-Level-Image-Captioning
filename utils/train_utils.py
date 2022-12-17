@@ -17,7 +17,7 @@ def save_preds(epoch, pr_list):
         print(f"prediction of validation set saved in ./cache/preds_{epoch}.csv!") 
 
 
-def train_per_epoch(model, optimizer, grad_accum_epoches, train_dataloader):
+def train_per_epoch(model, optimizer, grad_accum_step, train_dataloader):
     '''
         for each batch rounds in a epoch
     '''
@@ -25,7 +25,6 @@ def train_per_epoch(model, optimizer, grad_accum_epoches, train_dataloader):
 
     train_bar = tqdm(train_dataloader, total=len(train_dataloader), position=0, leave=True, ncols=100)
 
-    # for idx, (images, captions) in enumerate(train_loader):
     for idx, (images, captions) in enumerate(train_bar):
         print("\r", idx, end="")
         outputs = model(images, captions)
@@ -33,7 +32,7 @@ def train_per_epoch(model, optimizer, grad_accum_epoches, train_dataloader):
         train_loss += loss.item()
         loss.backward()
 
-        if ((idx+1) % grad_accum_epoches == 0):
+        if ((idx+1) % grad_accum_step == 0):
             optimizer.step()
             optimizer.zero_grad()
 
