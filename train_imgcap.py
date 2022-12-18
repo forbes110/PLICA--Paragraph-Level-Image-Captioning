@@ -6,6 +6,7 @@ from transformers import Adafactor
 from torch.utils.data import DataLoader
 from config import parse_args
 from tqdm.auto import tqdm
+import torch
 
 from model.ImgCapModel import ImgCapModel
 from utils.ImgCapDataset import ImgCapDataset
@@ -15,20 +16,21 @@ from utils.train_utils import (
     valid_per_epoch,
     load_raw_datasets
 )
-os.environ['CUDA_VISIBLE_DEVICES'] = '2'
+# os.environ['CUDA_VISIBLE_DEVICES'] = ''
 
 
 '''
     configs
 '''
 args = parse_args()
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
 def training(train_dataloader, valid_dataloader):
     '''
         main function of train
     '''
-    model = ImgCapModel()
+    model = ImgCapModel().to(device)
 
     optimizer = Adafactor(
         model.parameters(),
@@ -87,6 +89,12 @@ def training(train_dataloader, valid_dataloader):
         #     valid_dataloader,
         #     metric,
         #     gen_kwargs
+        # )
+
+        # print("---Validation---")
+        # model.eval()
+        # gen_kwargs = {
+        #     "max_length": args.val_max_target_length,
         # )
 
         # pr_list = {
