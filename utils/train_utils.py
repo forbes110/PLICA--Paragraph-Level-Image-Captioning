@@ -80,7 +80,7 @@ def load_raw_datasets(args):
         if args.train_file is not None:
             data_files["train"] = args.train_file
 
-        if args.validation_file is not None:
+        if args.valid_file is not None:
             data_files["valid"] = args.valid_file
 
         # if args.test_file is not None:
