@@ -13,7 +13,7 @@ bash ./scripts/download.sh
 ## Training
 ```shell
 # for test only
-python train_imacap.py --dataset_name maderix/flickr_bw_rgb
+python train_imgcap.py --dataset_name maderix/flickr_bw_rgb
 ```
 ## Inferencing
 

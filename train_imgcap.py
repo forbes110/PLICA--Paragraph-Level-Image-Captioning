@@ -1,15 +1,13 @@
 import os
 import time
-import numpy as np
+import evaluate
 from transformers import Adafactor
 
-import torch
-from torch.utils.data import DataLoader, Dataset
+from torch.utils.data import DataLoader
 from config import parse_args
 from tqdm.auto import tqdm
-import evaluate
 
-from models.ImgCapModel import ImgCapModel
+from model.ImgCapModel import ImgCapModel
 from utils.ImgCapDataset import ImgCapDataset
 from utils.train_utils import (
     save_preds,
@@ -24,7 +22,6 @@ os.environ['CUDA_VISIBLE_DEVICES'] = '2'
     configs
 '''
 args = parse_args()
-
 
 
 def training(train_dataloader, valid_dataloader):
@@ -50,7 +47,7 @@ def training(train_dataloader, valid_dataloader):
     metric = evaluate.load("rouge")
     metric = evaluate.load("bleu")
 
-    ## to save results
+    # to save results
     print("***Start training***")
 
     for epoch in range(args.num_epoches):
@@ -60,52 +57,52 @@ def training(train_dataloader, valid_dataloader):
         model.train()
         start_time = time.time()
 
-        ## per batch
+        # per batch
         train_loss = train_per_epoch(
-            model, 
-            optimizer, 
-            args.grad_accu_step, 
+            model,
+            optimizer,
+            args.grad_accu_step,
             train_dataloader
         )
 
-        print("---Validation---")
-        model.eval()
-        gen_kwargs = {
-            "max_length": args.val_max_target_length,
-            "num_beams": args.num_beams,
-            "do_sample": args.do_sample, 
-            "top_k": args.top_k, 
-            "top_p": args.top_p,
-            "typical_p": args.typical_p,
-            "temperature": args.temperature,
-            "repetition_penalty": args.repetition_penalty,
-            "no_repeat_ngram_size": args.no_repeat_ngram_size,
-        }
+        # print("---Validation---")
+        # model.eval()
+        # gen_kwargs = {
+        #     "max_length": args.val_max_target_length,
+        #     "num_beams": args.num_beams,
+        #     "do_sample": args.do_sample,
+        #     "top_k": args.top_k,
+        #     "top_p": args.top_p,
+        #     "typical_p": args.typical_p,
+        #     "temperature": args.temperature,
+        #     "repetition_penalty": args.repetition_penalty,
+        #     "no_repeat_ngram_size": args.no_repeat_ngram_size,
+        # }
 
-        ## output: predictions, reference and metrics for them
-        predictions, references, metric = valid_per_epoch(
-            model, 
-            optimizer, 
-            args.grad_accu_step, 
-            valid_dataloader,
-            metric,
-            gen_kwargs
-        )
+        # # output: predictions, reference and metrics for them
+        # predictions, references, metric = valid_per_epoch(
+        #     model,
+        #     optimizer,
+        #     args.grad_accu_step,
+        #     valid_dataloader,
+        #     metric,
+        #     gen_kwargs
+        # )
 
-        pr_list = {
-            "preds": predictions,
-            "refs": references
-        }
+        # pr_list = {
+        #     "preds": predictions,
+        #     "refs": references
+        # }
 
-        ## rouge/bleu score
-        result = metric.compute(use_stemmer=True)
-        result = {k: round(v * 100, 4) for k, v in result.items()}
-        print(result)
+        # # rouge/bleu score
+        # result = metric.compute(use_stemmer=True)
+        # result = {k: round(v * 100, 4) for k, v in result.items()}
+        # print(result)
 
-        ## save preds of validation set to check each epoch
-        save_preds(epoch, pr_list)
+        # save preds of validation set to check each epoch
+        # save_preds(epoch, pr_list)
 
-        ## save and check
+        # save and check
         model_path = os.path.join(
             "test/", "model_{}".format(epoch + 1))
         model.save_model(model_path)
@@ -113,26 +110,26 @@ def training(train_dataloader, valid_dataloader):
         print("time:{}, epoch:{}/{}, train_loss:{}".format(
             time.time()-start_time, epoch+1, args.num_epoches, train_loss))
 
-def main():
 
+def main():
     " load data "
     raw_datasets = load_raw_datasets(args)
 
     " dataset and dataloader"
     train_dataset = ImgCapDataset(raw_datasets["train"])
     train_dataloader = DataLoader(
-        train_dataset, 
+        train_dataset,
         batch_size=args.batch_size,
         collate_fn=train_dataset.collate_fn
     )
 
     valid_dataset = ImgCapDataset(raw_datasets["valid"])
     valid_dataloader = DataLoader(
-        valid_dataset, 
+        valid_dataset,
         batch_size=args.batch_size,
         collate_fn=valid_dataset.collate_fn
     )
-    
+
     "train/valid"
     training(train_dataloader, valid_dataloader)
 
