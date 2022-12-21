@@ -24,10 +24,11 @@ def train_per_epoch(model, optimizer, grad_accum_step, train_dataloader):
     '''
     train_loss = 0
 
-    train_bar = tqdm(train_dataloader, total=len(train_dataloader), position=0, leave=True, ncols=100)
+    train_bar = tqdm(train_dataloader, total=len(train_dataloader), position=0, leave=False, ncols=100)
 
+    print('prepare for loop')
     for idx, (images, captions) in enumerate(train_bar):
-        print("\r", idx, end="")
+        print('in for loop')
 
         outputs = model(images, captions)
         loss = outputs.loss
@@ -73,6 +74,7 @@ def load_raw_datasets(args):
 
         # Deal with datasets with no validation set
         if args.dataset_name == "maderix/flickr_bw_rgb":
+            print('the valid dataset is empty!')
             raw_datasets["valid"] = []
 
     else:

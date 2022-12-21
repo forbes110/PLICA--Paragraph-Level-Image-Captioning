@@ -125,6 +125,8 @@ def main():
 
     " dataset and dataloader"
     train_dataset = ImgCapDataset(raw_datasets["train"])
+    print('train dataset format:')
+    print(train_dataset)
     train_dataloader = DataLoader(
         train_dataset,
         batch_size=args.batch_size,
@@ -132,6 +134,8 @@ def main():
     )
 
     valid_dataset = ImgCapDataset(raw_datasets["valid"])
+    print('valid dataset format:')
+    print(valid_dataset)
     valid_dataloader = DataLoader(
         valid_dataset,
         batch_size=args.batch_size,
