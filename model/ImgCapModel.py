@@ -4,9 +4,6 @@ from transformers import (
     BertTokenizer,
     ViTFeatureExtractor,
     VisionEncoderDecoderModel,
-    ViTConfig,
-    BertConfig,
-    VisionEncoderDecoderConfig
 )
 
 
@@ -29,7 +26,6 @@ class ImgCapModel(nn.Module):
         self,
         encoder_name="google/vit-base-patch16-224-in21k",
         decoder_name="bert-base-uncased",
-        gen_config=None
     ):
 
         super().__init__()
@@ -57,9 +53,6 @@ class ImgCapModel(nn.Module):
         self.model.config.decoder_start_token_id = self.tokenizer.cls_token_id
         self.model.config.pad_token_id = self.tokenizer.pad_token_id
 
-        # for generation
-        self.gen_config = gen_config
-
     def forward(self, image, caption=None):
 
         pixel_values = self.image_processor(
@@ -75,14 +68,12 @@ class ImgCapModel(nn.Module):
 
         return self.model(pixel_values=pixel_values, labels=labels)
 
-    def inference(self, image):
-
-        # gen_kwargs = {**self.gen_config}
+    def inference(self, image, gen_kwargs):
 
         pixel_values = self.image_processor(
             image, return_tensors="pt").pixel_values.to(self.device)
 
-        generated_ids = self.model.generate(pixel_values)
+        generated_ids = self.model.generate(pixel_values, **gen_kwargs)
 
         generated_text = self.tokenizer.batch_decode(
             generated_ids, skip_special_tokens=True)

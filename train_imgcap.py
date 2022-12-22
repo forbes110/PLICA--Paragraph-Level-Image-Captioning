@@ -82,7 +82,6 @@ def training(train_dataloader, valid_dataloader):
         print("-----Train-----")
         model.train()
         train_loss = 0
-        start_time = time.time()
 
         # per batch
         train_loss = train_per_epoch(
@@ -98,12 +97,11 @@ def training(train_dataloader, valid_dataloader):
         print("---Validation---")
         model.eval()
         gen_kwargs = {
-            # "max_length": args.val_max_target_length,
-            # "num_beams": args.num_beams,
-            # "do_sample": args.do_sample,
+            "max_length": args.val_max_target_length,
+            "num_beams": args.num_beams,
+            "do_sample": args.do_sample,
             # "top_k": args.top_k,
             # "top_p": args.top_p,
-            # "typical_p": args.typical_p,
             # "temperature": args.temperature,
             # "repetition_penalty": args.repetition_penalty,
             # "no_repeat_ngram_size": args.no_repeat_ngram_size,
@@ -138,9 +136,6 @@ def training(train_dataloader, valid_dataloader):
         model_path = os.path.join(
             "test/", "model_{}".format(epoch + 1))
         model.save_model(model_path)
-
-        # print("time:{}, epoch:{}/{}, train_loss:{}".format(
-        #     time.time()-start_time, epoch+1, args.num_epoches, train_loss))
 
         print('Train Loss: {:3.6f} | Val Loss: {:3.6f}'.format(
                 train_loss, 0,))

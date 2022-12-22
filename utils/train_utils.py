@@ -15,7 +15,7 @@ def save_preds(epoch, pr_list):
         for pred, ref in zip(pr_list['preds'], pr_list['refs']):
             writer.writerow([pred, ref])
         print(
-            f"prediction of validation set saved in ./cache/preds_{epoch}.csv!")
+            f"prediction of validation set saved in ./cache/preds_{epoch+1}.csv!")
 
 
 def train_per_epoch(model, optimizer, lr_scheduler, grad_accum_step, train_dataloader, epoch, args):
@@ -66,8 +66,8 @@ def valid_per_epoch(model, optimizer, batch_size, valid_dataloader, metric, gen_
     for idx, (images, captions) in enumerate(valid_bar):
 
         with torch.no_grad():
-            predictions = model.inference(images)
-            references = captions
+            predictions += model.inference(images, gen_kwargs)
+            references += captions
             metric.add_batch(
                 predictions=predictions,
                 references=references,

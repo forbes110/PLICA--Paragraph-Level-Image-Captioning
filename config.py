@@ -15,6 +15,15 @@ def parse_args() -> Namespace:
         "--dataset_name", default=None, type=str
     )
     parser.add_argument(
+        "--val_max_target_length", default=60, type=int
+    )
+    parser.add_argument(
+        "--num_beams", default=1, type=int
+    )
+    parser.add_argument(
+        "--do_sample", action="store_true", help="Sample or not"
+    )
+    parser.add_argument(
         "--train_file", default='./data/processed/paragraphs/train_file.json', type=str
     )
     parser.add_argument(
