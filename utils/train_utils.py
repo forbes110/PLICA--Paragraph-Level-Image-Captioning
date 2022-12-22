@@ -18,7 +18,7 @@ def save_preds(epoch, pr_list):
             f"prediction of validation set saved in ./cache/preds_{epoch}.csv!")
 
 
-def train_per_epoch(model, optimizer, grad_accum_step, train_dataloader):
+def train_per_epoch(model, optimizer, lr_scheduler, grad_accum_step, train_dataloader, epoch, args):
     '''
         for each batch rounds in a epoch
     '''
@@ -27,20 +27,33 @@ def train_per_epoch(model, optimizer, grad_accum_step, train_dataloader):
     train_bar = tqdm(train_dataloader, total=len(
         train_dataloader), position=0, leave=False, ncols=100)
 
-    print('prepare for loop')
     for idx, (images, captions) in enumerate(train_bar):
-        print('in for loop')
-
         outputs = model(images, captions)
         loss = outputs.loss
+        train_bar.set_postfix({'loss': loss.detach().item()})
+
         train_loss += loss.item()
         loss.backward()
 
+        ## L1-regularization
+        if args.use_L1reg == True:
+
+            ## L1_reg collect from all params
+            L1_reg = torch.tensor(0.).to(args.device)
+            for param in model.parameters():
+                L1_reg += torch.sum(torch.abs(param).to(args.device))
+                
+            ## L1 penalty
+            loss +=  args.lambda_val * L1_reg
+
+        train_bar.set_description(f'Epoch [{epoch+1}/{args.num_epoches}]')
         if ((idx+1) % grad_accum_step == 0):
             optimizer.step()
+            lr_scheduler.step()
             optimizer.zero_grad()
 
     train_loss = train_loss / len(train_dataloader)
+
     return train_loss
 
 
