@@ -1,19 +1,20 @@
 # ADL-Final-Project
 
-## Environment Setup
+## Environment Setup(default in download.sh)
 ```shell
 (optional) conda create -n <name> python=3.9
 pip install -r requirements.txt
 ```
-## Dataset loading & preprocessing
 
+# Run Code From Scratch
+## 1. Dataset loading, preprocessing and environment setup
 ```shell
-bash ./scripts/download.sh
+bash scripts/download.sh
 ```
-## Training
+## 2. Training(or if you only need to eval/predict, skip this step)
 ```shell
-# for test only
-python train_imgcap.py --dataset_name maderix/flickr_bw_rgb
+## tune config in scripts/train.sh
+bash scripts/train.sh
 ```
 ## Inferencing
 

@@ -18,27 +18,40 @@ def save_preds(epoch, pr_list):
             f"prediction of validation set saved in ./cache/preds_{epoch}.csv!")
 
 
-def train_per_epoch(model, optimizer, grad_accum_step, train_dataloader):
+def train_per_epoch(model, optimizer, lr_scheduler, grad_accum_step, train_dataloader, epoch, args):
     '''
         for each batch rounds in a epoch
     '''
     train_loss = 0
-
-    train_bar = tqdm(train_dataloader, total=len(
-        train_dataloader), position=0, leave=True, ncols=100)
+    train_bar = tqdm(train_dataloader, total=len(train_dataloader), position=0, leave=True, ncols=100)
 
     for idx, (images, captions) in enumerate(train_bar):
-        print("\r", idx, end="")
         outputs = model(images, captions)
         loss = outputs.loss
+        train_bar.set_postfix({'loss': loss.detach().item()})
+
         train_loss += loss.item()
         loss.backward()
 
+        ## L1-regularization
+        if args.use_L1reg == True:
+
+            ## L1_reg collect from all params
+            L1_reg = torch.tensor(0.).to(args.device)
+            for param in model.parameters():
+                L1_reg += torch.sum(torch.abs(param).to(args.device))
+                
+            ## L1 penalty
+            loss +=  args.lambda_val * L1_reg
+
+        train_bar.set_description(f'Epoch [{epoch+1}/{args.num_epoches}]')
         if ((idx+1) % grad_accum_step == 0):
             optimizer.step()
+            lr_scheduler.step()
             optimizer.zero_grad()
 
     train_loss = train_loss / len(train_dataloader)
+
     return train_loss
 
 
@@ -73,6 +86,7 @@ def load_raw_datasets(args):
 
         # Deal with datasets with no validation set
         if args.dataset_name == "maderix/flickr_bw_rgb":
+            print('the valid dataset is empty!')
             raw_datasets["valid"] = []
 
     else:
@@ -80,7 +94,7 @@ def load_raw_datasets(args):
         if args.train_file is not None:
             data_files["train"] = args.train_file
 
-        if args.validation_file is not None:
+        if args.valid_file is not None:
             data_files["valid"] = args.valid_file
 
         # if args.test_file is not None:

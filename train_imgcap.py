@@ -1,11 +1,15 @@
 import os
 import time
 import evaluate
-from transformers import Adafactor
+from transformers import (
+    Adafactor,
+    get_scheduler
+)
 
 from torch.utils.data import DataLoader
 from config import parse_args
 from tqdm.auto import tqdm
+import torch
 
 from model.ImgCapModel import ImgCapModel
 from utils.ImgCapDataset import ImgCapDataset
@@ -15,44 +19,66 @@ from utils.train_utils import (
     valid_per_epoch,
     load_raw_datasets
 )
-os.environ['CUDA_VISIBLE_DEVICES'] = '2'
-
+import math
 
 '''
     configs
 '''
 args = parse_args()
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
 def training(train_dataloader, valid_dataloader):
     '''
         main function of train
     '''
-    model = ImgCapModel()
+    model = ImgCapModel().to(device)
 
-    optimizer = Adafactor(
-        model.parameters(),
-        lr=1e-4,
-        eps=(1e-30, 1e-3),
-        clip_threshold=1.0,
-        decay_rate=-0.8,
-        beta1=None,
-        weight_decay=0.0,
-        relative_step=False,
-        scale_parameter=False,
-        warmup_init=False
+    optimizer_choices = {
+        'AdamW': torch.optim.AdamW(
+            model.parameters(), 
+            lr=args.learning_rate, 
+            weight_decay=args.weight_decay
+        ),
+        'Adafactor': Adafactor(
+            model.parameters(),
+            lr=1e-4,
+            eps=(1e-30, 1e-3),
+            clip_threshold=1.0,
+            decay_rate=-0.8,
+            beta1=None,
+            weight_decay=0.0,
+            relative_step=False,
+            scale_parameter=False,
+            warmup_init=False
+        )
+    }
+    optimizer = optimizer_choices[args.optimizer]
+
+    ## scheduler check
+    num_update_steps_per_epoch = math.ceil(len(train_dataloader) / args.grad_accu_step)
+    max_train_steps = args.num_epoches * num_update_steps_per_epoch
+    lr_scheduler = get_scheduler(
+        name=args.lr_scheduler_type,
+        optimizer=optimizer,
+        num_warmup_steps=args.num_warmup_steps * args.grad_accu_step,
+        num_training_steps=max_train_steps * args.grad_accu_step,
     )
 
     # do f1 for these two?
     metric = evaluate.load("rouge")
     metric = evaluate.load("bleu")
 
-    # to save results
+    ## check config
+    for arg in vars(args):
+        print(f"<{arg}>: {getattr(args, arg)}")
+        print("==================================")
+
+
     print("***Start training***")
 
-    for epoch in range(args.num_epoches):
-        print(f"\n=== Epoch {epoch+1} ===")
 
+    for epoch in range(args.num_epoches):
         print("-----Train-----")
         model.train()
         start_time = time.time()
@@ -60,9 +86,12 @@ def training(train_dataloader, valid_dataloader):
         # per batch
         train_loss = train_per_epoch(
             model,
-            optimizer,
+            optimizer_choices[args.optimizer],
+            lr_scheduler,
             args.grad_accu_step,
-            train_dataloader
+            train_dataloader,
+            epoch,
+            args
         )
 
         # print("---Validation---")
@@ -89,6 +118,12 @@ def training(train_dataloader, valid_dataloader):
         #     gen_kwargs
         # )
 
+        # print("---Validation---")
+        # model.eval()
+        # gen_kwargs = {
+        #     "max_length": args.val_max_target_length,
+        # )
+
         # pr_list = {
         #     "preds": predictions,
         #     "refs": references
@@ -107,8 +142,11 @@ def training(train_dataloader, valid_dataloader):
             "test/", "model_{}".format(epoch + 1))
         model.save_model(model_path)
 
-        print("time:{}, epoch:{}/{}, train_loss:{}".format(
-            time.time()-start_time, epoch+1, args.num_epoches, train_loss))
+        # print("time:{}, epoch:{}/{}, train_loss:{}".format(
+        #     time.time()-start_time, epoch+1, args.num_epoches, train_loss))
+
+        print('Train Loss: {:3.6f} | Val Loss: {:3.6f}'.format(
+                train_loss, 0,))
 
 
 def main():
@@ -117,6 +155,8 @@ def main():
 
     " dataset and dataloader"
     train_dataset = ImgCapDataset(raw_datasets["train"])
+    print('train dataset format:')
+    print(train_dataset)
     train_dataloader = DataLoader(
         train_dataset,
         batch_size=args.batch_size,
@@ -124,6 +164,8 @@ def main():
     )
 
     valid_dataset = ImgCapDataset(raw_datasets["valid"])
+    print('valid dataset format:')
+    print(valid_dataset)
     valid_dataloader = DataLoader(
         valid_dataset,
         batch_size=args.batch_size,

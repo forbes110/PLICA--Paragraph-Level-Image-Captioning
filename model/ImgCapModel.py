@@ -35,7 +35,8 @@ class ImgCapModel(nn.Module):
         super().__init__()
 
         # check device
-        self.device = torch.device("cuda")
+        # self.device = torch.device("cuda")
+        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         print("Using device: ", self.device)
 
         " sub-tools "
