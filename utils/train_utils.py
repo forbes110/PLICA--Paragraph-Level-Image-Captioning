@@ -24,7 +24,8 @@ def train_per_epoch(model, optimizer, grad_accum_step, train_dataloader):
     '''
     train_loss = 0
 
-    train_bar = tqdm(train_dataloader, total=len(train_dataloader), position=0, leave=False, ncols=100)
+    train_bar = tqdm(train_dataloader, total=len(
+        train_dataloader), position=0, leave=False, ncols=100)
 
     print('prepare for loop')
     for idx, (images, captions) in enumerate(train_bar):
@@ -52,16 +53,14 @@ def valid_per_epoch(model, optimizer, batch_size, valid_dataloader, metric, gen_
     for idx, (images, captions) in enumerate(valid_bar):
 
         with torch.no_grad():
-            # ...
-
-            decoded_preds, decoded_labels = 0, 0
-            predictions, references = 0, 0
+            predictions = model.inference(images)
+            references = captions
             metric.add_batch(
-                predictions=decoded_preds,
-                references=decoded_labels,
+                predictions=predictions,
+                references=references,
             )
 
-        return predictions, references, metric
+    return predictions, references, metric
 
 
 def load_raw_datasets(args):

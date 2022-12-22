@@ -77,7 +77,7 @@ class ImgCapModel(nn.Module):
 
     def inference(self, image):
 
-        gen_kwargs = {**self.gen_config}
+        # gen_kwargs = {**self.gen_config}
 
         pixel_values = self.image_processor(
             image, return_tensors="pt").pixel_values.to(self.device)
@@ -85,7 +85,7 @@ class ImgCapModel(nn.Module):
         generated_ids = self.model.generate(pixel_values)
 
         generated_text = self.tokenizer.batch_decode(
-            generated_ids, skip_special_tokens=True)[0]
+            generated_ids, skip_special_tokens=True)
 
         return generated_text
 

@@ -57,6 +57,7 @@ def training(train_dataloader, valid_dataloader):
 
         print("-----Train-----")
         model.train()
+        train_loss = 0
         start_time = time.time()
 
         # per batch
@@ -67,48 +68,44 @@ def training(train_dataloader, valid_dataloader):
             train_dataloader
         )
 
-        # print("---Validation---")
-        # model.eval()
-        # gen_kwargs = {
-        #     "max_length": args.val_max_target_length,
-        #     "num_beams": args.num_beams,
-        #     "do_sample": args.do_sample,
-        #     "top_k": args.top_k,
-        #     "top_p": args.top_p,
-        #     "typical_p": args.typical_p,
-        #     "temperature": args.temperature,
-        #     "repetition_penalty": args.repetition_penalty,
-        #     "no_repeat_ngram_size": args.no_repeat_ngram_size,
-        # }
+        print("---Validation---")
+        model.eval()
+        gen_kwargs = {
+            # "max_length": args.val_max_target_length,
+            # "num_beams": args.num_beams,
+            # "do_sample": args.do_sample,
+            # "top_k": args.top_k,
+            # "top_p": args.top_p,
+            # "typical_p": args.typical_p,
+            # "temperature": args.temperature,
+            # "repetition_penalty": args.repetition_penalty,
+            # "no_repeat_ngram_size": args.no_repeat_ngram_size,
+        }
 
-        # # output: predictions, reference and metrics for them
-        # predictions, references, metric = valid_per_epoch(
-        #     model,
-        #     optimizer,
-        #     args.grad_accu_step,
-        #     valid_dataloader,
-        #     metric,
-        #     gen_kwargs
-        # )
+        # output: predictions, reference and metrics for them
+        predictions, references, metric = valid_per_epoch(
+            model,
+            optimizer,
+            args.grad_accu_step,
+            valid_dataloader,
+            metric,
+            gen_kwargs
+        )
 
-        # print("---Validation---")
-        # model.eval()
-        # gen_kwargs = {
-        #     "max_length": args.val_max_target_length,
-        # )
+        print("---Validation---")
+        model.eval()
 
-        # pr_list = {
-        #     "preds": predictions,
-        #     "refs": references
-        # }
+        pr_list = {
+            "preds": predictions,
+            "refs": references
+        }
 
-        # # rouge/bleu score
-        # result = metric.compute(use_stemmer=True)
-        # result = {k: round(v * 100, 4) for k, v in result.items()}
-        # print(result)
+        # rouge/bleu score
+        result = metric.compute(references=references, predictions=predictions)
+        print(result)
 
         # save preds of validation set to check each epoch
-        # save_preds(epoch, pr_list)
+        save_preds(epoch, pr_list)
 
         # save and check
         model_path = os.path.join(
