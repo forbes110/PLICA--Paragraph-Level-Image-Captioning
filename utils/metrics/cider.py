@@ -1,4 +1,4 @@
-from pycocoevalcap.bleu.bleu import Bleu
+# from pycocoevalcap.bleu.bleu import Bleu
 from pycocoevalcap.meteor.meteor import Meteor 
 import copy
 from collections import defaultdict
@@ -213,17 +213,11 @@ class Cider:
         imgIds = gts.keys()
 
         cider_scorer = CiderScorer(n=self._n, sigma=self._sigma)
-        print('res', res)
-        print('gts', gts)
 
         # for id,_ in enumerate(gts):
         for id in imgIds:
             hypo = res[id]
             ref = gts[id]
-
-            print(f'hypo{id}', hypo)
-            print(f'ref{id}', ref)
-
             # Sanity check.
             assert(type(hypo) is list)
             assert(len(hypo) == 1)
@@ -248,11 +242,11 @@ score_factor = {
     'CIDEr': 10,
 }
 
-def cal_score(ref, sample):
+def cider_score(ref, sample):
     # ref and sample are both dict
     scorers = [
-        (Bleu(4), ["BLEU_1", "BLEU_2", "BLEU_3", "BLEU_4"]),
-        (Meteor(),"METEOR"),
+        # (Bleu(4), ["BLEU_1", "BLEU_2", "BLEU_3", "BLEU_4"]),
+        # (Meteor(),"METEOR"),
         (Cider(),"CIDEr")
     ]
     final_scores = {}
@@ -272,13 +266,17 @@ if __name__ == '__main__':
     ## test
     reference = {
         136:["this is a dog with bad tail, which is not only bad but failed."],
+        100:["I love you"],
+        12:["what the fuck"]
     } 
 
     prediction = {
         136:["this is a dog with good tail"],
+        100:["I love you"],
+        12:["what the fuck"]
     }
     # a = calc_scores(reference, prediction)
-    a = cal_score(reference, prediction)
+    a = cider_score(reference, prediction)
     # print(type(a))
     # print(len(a))
     print('result', a)

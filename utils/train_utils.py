@@ -2,6 +2,10 @@ import csv
 from tqdm.auto import tqdm
 import torch
 from datasets import load_dataset
+from pycocoevalcap.meteor.meteor import Meteor 
+from metrics import (
+    bleu_score, cider_score
+)
 
 
 def save_preds(epoch, pr_list):
@@ -68,6 +72,7 @@ def valid_per_epoch(model, optimizer, batch_size, valid_dataloader, metric, gen_
         with torch.no_grad():
             predictions += model.inference(images, gen_kwargs)
             references += captions
+
             metric.add_batch(
                 predictions=predictions,
                 references=references,
@@ -104,3 +109,7 @@ def load_raw_datasets(args):
         raw_datasets = load_dataset(extension, data_files=data_files)
 
     return raw_datasets
+
+class metric:
+    def add_batch():
+        pass
