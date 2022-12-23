@@ -101,7 +101,6 @@ def training(train_dataloader, valid_dataloader):
 
         wandb.log({"train_loss": train_loss})
 
-        print("---Validation---")
         model.eval()
         gen_kwargs = {
             "max_length": args.val_max_target_length,
