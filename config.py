@@ -10,6 +10,17 @@ from transformers import SchedulerType
 def parse_args() -> Namespace:
     parser = ArgumentParser()
 
+    ''' raw files '''
+    parser.add_argument(
+        "--raw_train_split", default='./data/raw/train_split.json', type=str
+    )    
+    parser.add_argument(
+        "--raw_valid_split", default='./data/raw/valid_split.json', type=str
+    )
+    parser.add_argument(
+        "--raw_test_split", default='./data/raw/test_split.json', type=str
+    )
+
     ''' processed files'''
     parser.add_argument(
         "--dataset_name", default=None, type=str

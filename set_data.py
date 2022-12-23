@@ -84,9 +84,9 @@ if __name__ == '__main__':
     print(f' There are {len(all_parag)} data')
 
     ## splits
-    train_ids = load_json_file('./data/raw/train_split.json') 
-    valid_ids = load_json_file('./data/raw/valid_split.json') 
-    test_ids = load_json_file('./data/raw/test_split.json') 
+    train_ids = load_json_file(args.raw_train_split) 
+    valid_ids = load_json_file(args.raw_valid_split) 
+    test_ids = load_json_file(args.raw_test_split) 
 
     train_file, valid_file, test_file = preprocess_json(
         parags = all_parag,

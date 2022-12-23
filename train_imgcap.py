@@ -73,7 +73,9 @@ def training(train_dataloader, valid_dataloader):
     metric = evaluate.load("rouge")
     metric = evaluate.load("bleu")
 
-    ## check config
+    ## check config and save to wandb
+    # config = wandb.config
+    wandb.config.update(args) 
     for arg in vars(args):
         print(f"<{arg}>: {getattr(args, arg)}")
         print("==================================")
@@ -83,7 +85,7 @@ def training(train_dataloader, valid_dataloader):
 
 
     for epoch in range(args.num_epoches):
-        print("-----Train-----")
+        print(f"-----Epoch[{epoch+1}/{args.num_epoches}]-----")
         model.train()
         train_loss = 0
 
@@ -92,11 +94,12 @@ def training(train_dataloader, valid_dataloader):
             model,
             optimizer_choices[args.optimizer],
             lr_scheduler,
-            args.grad_accu_step,
             train_dataloader,
             epoch,
             args
         )
+
+        wandb.log({"train_loss": train_loss})
 
         print("---Validation---")
         model.eval()
@@ -111,18 +114,12 @@ def training(train_dataloader, valid_dataloader):
             # "no_repeat_ngram_size": args.no_repeat_ngram_size,
         }
 
-        # output: predictions, reference and metrics for them
-        predictions, references, metric = valid_per_epoch(
+        # output: val_ids(for check image), predictions, reference and scores from metrics
+        val_ids, predictions, references, scores = valid_per_epoch(
             model,
-            optimizer,
-            args.grad_accu_step,
             valid_dataloader,
-            metric,
             gen_kwargs
         )
-
-        print("---Validation---")
-        model.eval()
 
         pr_list = {
             "preds": predictions,
@@ -130,19 +127,23 @@ def training(train_dataloader, valid_dataloader):
         }
 
         # rouge/bleu score
-        result = metric.compute(references=references, predictions=predictions)
-        print(result)
+        # result = metric.compute(references=references, predictions=predictions)
+        print(scores)
+        wandb.log(scores)
+
 
         # save preds of validation set to check each epoch
         save_preds(epoch, pr_list)
 
         # save and check
-        model_path = os.path.join(
-            "test/", "model_{}".format(epoch + 1))
-        model.save_model(model_path)
+        model_path = os.path.join("test/", "model_{}".format(epoch + 1))
 
-        print('Train Loss: {:3.6f} | Val Loss: {:3.6f}'.format(
-                train_loss, 0,))
+        model.save_model(model_path)
+        print('Train Loss: {:3.6f} | Val Loss: {:3.6f}'.format(train_loss, 0,))
+
+    ## save the best model to wandb
+    wandb.save(model_path)
+
 
 
 def main():
