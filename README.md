@@ -8,6 +8,7 @@ pip install -r requirements.txt
 
 # Run Code From Scratch
 ## 1. Dataset loading, preprocessing and environment setup
+before the script, install java by yourself.
 ```shell
 bash scripts/download.sh
 ```

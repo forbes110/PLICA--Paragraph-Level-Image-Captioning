@@ -20,6 +20,7 @@ from utils.train_utils import (
     load_raw_datasets
 )
 import math
+import wandb
 
 '''
     configs
@@ -32,6 +33,9 @@ def training(train_dataloader, valid_dataloader):
     '''
         main function of train
     '''
+    ## wanb to record process
+    wandb.init(project="img-prg-cap", entity="forbes-dl")
+
     model = ImgCapModel().to(device)
 
     optimizer_choices = {
