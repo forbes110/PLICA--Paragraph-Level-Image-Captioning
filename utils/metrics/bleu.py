@@ -340,13 +340,11 @@ def bleu_score(ref, sample):
     final_scores = {}
     for scorer, method in scorers:
         score, _ = scorer.compute_score(ref, sample)
-        if type(score) == list:
-            ## BLEU
-            for m, s in zip(method, score):
-                final_scores[m] = s*score_factor[m]
-        else:
-            ## METEOR, Cider
-            final_scores[method] = score*score_factor[method]
+        ## BLEU
+        for m, s in zip(method, score):
+            final_scores[m] = s*100
+
+    print(final_scores)
     return final_scores
 
 

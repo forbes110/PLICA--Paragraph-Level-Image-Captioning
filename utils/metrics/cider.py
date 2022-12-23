@@ -244,23 +244,11 @@ score_factor = {
 
 def cider_score(ref, sample):
     # ref and sample are both dict
-    scorers = [
-        # (Bleu(4), ["BLEU_1", "BLEU_2", "BLEU_3", "BLEU_4"]),
-        # (Meteor(),"METEOR"),
-        (Cider(),"CIDEr")
-    ]
-    final_scores = {}
-    for scorer, method in scorers:
-        score, _ = scorer.compute_score(ref, sample)
-        if type(score) == list:
-            ## BLEU
-            for m, s in zip(method, score):
-                final_scores[m] = s*score_factor[m]
-        else:
-            ## METEOR, Cider
-            final_scores[method] = score*score_factor[method]
-    return final_scores
-
+    scorer = Cider()
+    final_score = {}
+    score, _ = scorer.compute_score(ref, sample)
+    final_score["CIDEr"] = score*10
+    return final_score
 
 if __name__ == '__main__':
     ## test
@@ -280,6 +268,9 @@ if __name__ == '__main__':
     # print(type(a))
     # print(len(a))
     print('result', a)
+
+
+
 
 
 

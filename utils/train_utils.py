@@ -2,10 +2,11 @@ import csv
 from tqdm.auto import tqdm
 import torch
 from datasets import load_dataset
-from pycocoevalcap.meteor.meteor import Meteor 
-from metrics import (
-    bleu_score, cider_score
-)
+from utils.metrics.bleu import bleu_score
+from utils.metrics.cider import cider_score
+from utils.metrics.meteor import meteor_score
+from typing import *
+from dataclasses import dataclass, field
 
 
 def save_preds(epoch, pr_list):
@@ -21,17 +22,44 @@ def save_preds(epoch, pr_list):
         print(
             f"prediction of validation set saved in ./cache/preds_{epoch+1}.csv!")
 
+@dataclass
+class Metrics():
+    predictions:Dict[int,str] = field(default_factory=lambda:{})
+    references:Dict[int,str] = field(default_factory=lambda:{})
+    scores:Dict[str,float] = field(default_factory=lambda:{})
 
-def train_per_epoch(model, optimizer, lr_scheduler, grad_accum_step, train_dataloader, epoch, args):
+    def add_batch(self, ids:List[int], preds:List[str], refs:List[str]=None):
+        if refs is not None:
+            for (id, pred, ref) in zip(ids, preds, refs):
+                self.predictions[id] = [pred]
+                self.references[id] = [ref]
+        else:
+            for (id, pred) in zip(ids, preds):
+                self.predictions[id] = [pred]
+
+    def compute(self):
+        scores = {}
+        b_s = bleu_score(self.references, self.predictions)
+        for i in b_s.keys():
+            scores[i] = b_s[i]
+        c_s = cider_score(self.references, self.predictions)
+        scores['CIDEr'] = c_s['CIDEr']
+        m_s = meteor_score(self.references, self.predictions)
+        scores['METEOR'] = m_s['METEOR']
+        return scores
+
+
+def train_per_epoch(model, optimizer, lr_scheduler, train_dataloader, epoch, args):
     '''
         for each batch rounds in a epoch
     '''
     train_loss = 0
 
-    train_bar = tqdm(train_dataloader, total=len(
-        train_dataloader), position=0, leave=False, ncols=100)
+    train_bar = tqdm(train_dataloader, total=len(train_dataloader), position=0, leave=False, ncols=100)
+    train_bar.set_description('Train')
 
-    for idx, (images, captions) in enumerate(train_bar):
+
+    for idx, (_, images, captions) in enumerate(train_bar):
         outputs = model(images, captions)
         loss = outputs.loss
         train_bar.set_postfix({'loss': loss.detach().item()})
@@ -50,8 +78,7 @@ def train_per_epoch(model, optimizer, lr_scheduler, grad_accum_step, train_datal
             ## L1 penalty
             loss +=  args.lambda_val * L1_reg
 
-        train_bar.set_description(f'Epoch [{epoch+1}/{args.num_epoches}]')
-        if ((idx+1) % grad_accum_step == 0):
+        if ((idx+1) % args.grad_accu_step == 0):
             optimizer.step()
             lr_scheduler.step()
             optimizer.zero_grad()
@@ -61,25 +88,53 @@ def train_per_epoch(model, optimizer, lr_scheduler, grad_accum_step, train_datal
     return train_loss
 
 
-def valid_per_epoch(model, optimizer, batch_size, valid_dataloader, metric, gen_kwargs):
+def valid_per_epoch(model, valid_dataloader, gen_kwargs):
 
     # to save result pair
+    metric = Metrics()
     predictions, references = [], []
-    valid_bar = tqdm(valid_dataloader, total=len(
-        valid_dataloader), position=0, leave=True, ncols=100)
-    for idx, (images, captions) in enumerate(valid_bar):
+    valid_bar = tqdm(valid_dataloader, total=len(valid_dataloader), position=0, leave=True, ncols=100)
+    valid_bar.set_description('Validation')
+
+
+    for ids, images, captions in valid_bar:
 
         with torch.no_grad():
             predictions += model.inference(images, gen_kwargs)
             references += captions
 
             metric.add_batch(
-                predictions=predictions,
-                references=references,
+                ids=ids,
+                preds=predictions,
+                refs=references,
             )
+    scores = metric.compute()
 
-    return predictions, references, metric
+    return ids, predictions, references, scores
 
+
+def predict(model, test_dataloader, gen_kwargs):
+
+    # to save result pair
+    metric = Metrics()
+    predictions, references = [], []
+    test_bar = tqdm(test_dataloader, total=len(test_dataloader), position=0, leave=True, ncols=100)
+    test_bar.set_description(f'Predict: ')
+
+
+    for ids, images, captions in test_bar:
+
+        with torch.no_grad():
+            predictions += model.inference(images, gen_kwargs)
+            references += captions
+
+            metric.add_batch(
+                ids=ids,
+                preds=predictions,
+            )
+    scores = metric.compute()
+
+    return ids, predictions, references, scores
 
 def load_raw_datasets(args):
     '''
@@ -110,6 +165,4 @@ def load_raw_datasets(args):
 
     return raw_datasets
 
-class metric:
-    def add_batch():
-        pass
+
