@@ -7,21 +7,13 @@ from typing import *
 import torch
 from transformers import SchedulerType
 
+
 def parse_args() -> Namespace:
     parser = ArgumentParser()
 
     ''' processed files'''
     parser.add_argument(
         "--dataset_name", default=None, type=str
-    )
-    parser.add_argument(
-        "--val_max_target_length", default=60, type=int
-    )
-    parser.add_argument(
-        "--num_beams", default=1, type=int
-    )
-    parser.add_argument(
-        "--do_sample", action="store_true", help="Sample or not"
     )
     parser.add_argument(
         "--train_file", default='./data/processed/paragraphs/train_file.json', type=str
@@ -58,7 +50,8 @@ def parse_args() -> Namespace:
         type=SchedulerType,
         default='linear',
         help="The scheduler type to use.",
-        choices=["linear", "cosine", "cosine_with_restarts", "polynomial", "constant", "constant_with_warmup"],
+        choices=["linear", "cosine", "cosine_with_restarts",
+                 "polynomial", "constant", "constant_with_warmup"],
     )
     parser.add_argument(
         "--learning_rate",
@@ -78,9 +71,15 @@ def parse_args() -> Namespace:
     parser.add_argument("--num_warmup_steps", type=int, default=0)
 
     '''output files'''
-
-
+    parser.add_argument(
+        "--val_max_target_length", default=60, type=int
+    )
+    parser.add_argument(
+        "--num_beams", default=1, type=int
+    )
+    parser.add_argument(
+        "--do_sample", action="store_true", help="Sample or not"
+    )
 
     args = parser.parse_args()
     return args
-
