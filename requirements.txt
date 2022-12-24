@@ -11,3 +11,7 @@ Pillow
 evaluate
 nltk
 rouge_score
+wandb
+Cython
+# git+https://github.com/salaniz/pycocoevalcap.git
+pycocoevalcap

@@ -2,6 +2,7 @@
 
 ## env
 pip install -r requirements.txt
+brew install java
 
 ## load raw data 
 if [ ! -f all_paragraphs.zip ]; then
