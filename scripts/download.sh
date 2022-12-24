@@ -17,9 +17,10 @@ if [ ! -f visual_genome.zip ]; then
 fi
 
 ## process paragraph data
-python3 set_data.py \
---raw_train_split ./data/try/try_train.json \
---raw_valid_split ./data/try/try_valid.json 
+python3 set_data.py 
+# \
+# --raw_train_split ./data/try/try_train.json \
+# --raw_valid_split ./data/try/try_valid.json 
 # --raw_train_split
 
 
