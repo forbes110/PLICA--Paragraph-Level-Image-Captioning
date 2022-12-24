@@ -36,7 +36,7 @@ def training(train_dataloader, valid_dataloader):
     ## wanb to record process
     wandb.init(project="img-prg-cap", entity="forbes-dl")
 
-    model = ImgCapModel().to(device)
+    model = ImgCapModel(args.use_pretrain_imgcap).to(device)
 
     optimizer_choices = {
         'AdamW': torch.optim.AdamW(
