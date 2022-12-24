@@ -5,5 +5,6 @@ python3 train_imgcap.py \
 --grad_accu_step 8 \
 --learning_rate 5e-5 \
 --optimizer AdamW \
---val_max_target_length 60
+--val_max_target_length 60 \
+--use_pretrain_imgcap
 

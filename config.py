@@ -38,6 +38,9 @@ def parse_args() -> Namespace:
 
     ''' training configs '''
     parser.add_argument(
+        "--use_pretrain_imgcap", action="store_true", help="Using pretrained img caption model"
+    )
+    parser.add_argument(
         "--batch_size", default=4, type=int
     )
     parser.add_argument(
