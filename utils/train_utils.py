@@ -7,9 +7,10 @@ from utils.metrics.cider import cider_score
 from utils.metrics.meteor import meteor_score
 from typing import *
 from dataclasses import dataclass, field
+import wandb
 
 
-def save_preds(epoch, pr_list):
+def save_preds(epoch, val_ids, pr_list):
     '''
         save preds/refs to compare
     '''
@@ -17,8 +18,8 @@ def save_preds(epoch, pr_list):
         writer = csv.writer(fp)
         writer.writerow(['id', 'predictions', 'references'])
 
-        for pred, ref in zip(pr_list['preds'], pr_list['refs']):
-            writer.writerow([pred, ref])
+        for val_id, pred, ref in zip(val_ids, pr_list['preds'], pr_list['refs']):
+            writer.writerow([val_id, pred, ref])
         print(
             f"prediction of validation set saved in ./cache/preds_{epoch+1}.csv!")
 
@@ -66,6 +67,8 @@ def train_per_epoch(model, optimizer, lr_scheduler, train_dataloader, epoch, arg
 
         train_loss += loss.item()
         loss.backward()
+        wandb.log({"train_loss": train_loss})
+
 
         ## L1-regularization
         if args.use_L1reg == True:

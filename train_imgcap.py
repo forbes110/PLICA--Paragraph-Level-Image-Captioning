@@ -95,7 +95,6 @@ def training(train_dataloader, valid_dataloader):
             args
         )
 
-        wandb.log({"train_loss": train_loss})
 
         model.eval()
         gen_kwargs = {
@@ -128,7 +127,7 @@ def training(train_dataloader, valid_dataloader):
 
 
         # save preds of validation set to check each epoch
-        save_preds(epoch, pr_list)
+        save_preds(epoch, val_ids, pr_list)
 
         # save and check
         model_path = os.path.join("test/", "model_{}".format(epoch + 1))

@@ -253,15 +253,13 @@ def cider_score(ref, sample):
 if __name__ == '__main__':
     ## test
     reference = {
-        136:["this is a dog with bad tail, which is not only bad but failed."],
-        100:["I love you"],
-        12:["what the fuck"]
+        136:["this is a dog with good tail"],
+        100:["I would kill you"],
     } 
 
     prediction = {
         136:["this is a dog with good tail"],
-        100:["I love you"],
-        12:["what the fuck"]
+        100:["I would kill you"],
     }
     # a = calc_scores(reference, prediction)
     a = cider_score(reference, prediction)

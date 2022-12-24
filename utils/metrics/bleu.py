@@ -351,7 +351,10 @@ def bleu_score(ref, sample):
 if __name__ == '__main__':
     ## test
     reference = {
-        136:["this is a dog with bad tail, which is not only bad but failed."],
+        # 136:["this is a dog with bad tail, which is not only bad but failed."],
+        # 100:["I love you"],
+        # 12:["what the fuck"]
+        136:["this is a dog with good tail"],
         100:["I love you"],
         12:["what the fuck"]
     } 
