@@ -36,7 +36,7 @@ def training(train_dataloader, valid_dataloader):
     ## wanb to record process
     wandb.init(project="img-prg-cap", entity="forbes-dl")
 
-    model = ImgCapModel().to(device)
+    model = ImgCapModel(args.use_pretrain_imgcap).to(device)
 
     optimizer_choices = {
         'AdamW': torch.optim.AdamW(
@@ -68,10 +68,6 @@ def training(train_dataloader, valid_dataloader):
         num_warmup_steps=args.num_warmup_steps * args.grad_accu_step,
         num_training_steps=max_train_steps * args.grad_accu_step,
     )
-
-    # do f1 for these two?
-    metric = evaluate.load("rouge")
-    metric = evaluate.load("bleu")
 
     ## check config and save to wandb
     # config = wandb.config
