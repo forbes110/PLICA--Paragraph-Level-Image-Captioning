@@ -69,10 +69,6 @@ def training(train_dataloader, valid_dataloader):
         num_training_steps=max_train_steps * args.grad_accu_step,
     )
 
-    # do f1 for these two?
-    metric = evaluate.load("rouge")
-    metric = evaluate.load("bleu")
-
     ## check config and save to wandb
     # config = wandb.config
     wandb.config.update(args) 
