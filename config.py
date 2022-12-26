@@ -38,6 +38,12 @@ def parse_args() -> Namespace:
 
     ''' training configs '''
     parser.add_argument(
+        "--encoder_name", default="google/vit-base-patch16-224-in21k", type=str
+    )
+    parser.add_argument(
+        "--decoder_name", default="gpt2", type=str
+    )
+    parser.add_argument(
         "--few_data_test", action="store_true", help="Sampling 100 data for testing correctness."
     )
     parser.add_argument(

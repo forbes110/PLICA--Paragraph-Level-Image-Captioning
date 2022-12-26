@@ -13,7 +13,7 @@ class ImgCapModel(nn.Module):
         Main model:
             Encoder \
                 "google/vit-base-patch16-224-in21k" \
-                "facebook/convnext-xlarge-384-22k-1k" \
+                "microsoft/swin-base-patch4-window7-224-in22k" \
 
             Decoder \
                 "gpt2" \

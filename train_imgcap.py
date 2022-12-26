@@ -25,6 +25,8 @@ import wandb
 '''
     configs
 '''
+
+os.environ["CUDA_VISIBLE_DEVICES"]="0"
 args = parse_args()
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -36,7 +38,7 @@ def training(train_dataloader, valid_dataloader):
     ## wanb to record process
     wandb.init(project="img-prg-cap", entity="forbes-dl")
 
-    model = ImgCapModel(args.use_pretrain_imgcap).to(device)
+    model = ImgCapModel(args.use_pretrain_imgcap, encoder_name=args.encoder_name, decoder_name=args.decoder_name).to(device)
 
     optimizer_choices = {
         'AdamW': torch.optim.AdamW(

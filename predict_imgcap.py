@@ -22,6 +22,8 @@ from utils.train_utils import (
 import math
 import wandb
 
+os.environ["CUDA_VISIBLE_DEVICES"]="1"
+
 '''
     configs
 '''
@@ -72,7 +74,7 @@ def main():
     " load data "
     raw_datasets = load_raw_datasets(args)
 
-    valid_dataset = ImgCapDataset(raw_datasets["test"])
+    valid_dataset = ImgCapDataset(raw_datasets["valid"])
     print('valid dataset format:')
     print(valid_dataset)
     valid_dataloader = DataLoader(
