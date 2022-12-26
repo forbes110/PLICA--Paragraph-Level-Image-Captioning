@@ -160,8 +160,8 @@ def load_raw_datasets(args):
         if args.valid_file is not None:
             data_files["valid"] = args.valid_file
 
-        # if args.test_file is not None:
-        #     data_files["test"] = args.test_file
+        if args.test_file is not None:
+            data_files["test"] = args.test_file
 
         extension = args.train_file.split(".")[-1]
         raw_datasets = load_dataset(extension, data_files=data_files)

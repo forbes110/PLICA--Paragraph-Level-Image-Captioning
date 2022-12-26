@@ -52,11 +52,8 @@ def testing(valid_dataloader):
         "max_length": args.val_max_target_length,
         "num_beams": args.num_beams,
         "do_sample": args.do_sample,
-        # "top_k": args.top_k,
-        # "top_p": args.top_p,
-        # "temperature": args.temperature,
-        # "repetition_penalty": args.repetition_penalty,
-        # "no_repeat_ngram_size": args.no_repeat_ngram_size,
+        "repetition_penalty": args.repetition_penalty,
+        "no_repeat_ngram_size": args.no_repeat_ngram_size,
     }
 
     # output: val_ids(for check image), predictions, reference and scores from metrics
@@ -75,7 +72,7 @@ def main():
     " load data "
     raw_datasets = load_raw_datasets(args)
 
-    valid_dataset = ImgCapDataset(raw_datasets["valid"])
+    valid_dataset = ImgCapDataset(raw_datasets["test"])
     print('valid dataset format:')
     print(valid_dataset)
     valid_dataloader = DataLoader(

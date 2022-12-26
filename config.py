@@ -92,6 +92,12 @@ def parse_args() -> Namespace:
         "--model_path", default=None, type=str
     )
     parser.add_argument(
+        "--repetition_penalty", default=1.0, type=float
+    )
+    parser.add_argument(
+        "--no_repeat_ngram_size", default=0, type=int
+    )
+    parser.add_argument(
         "--val_max_target_length", default=60, type=int
     )
     parser.add_argument(

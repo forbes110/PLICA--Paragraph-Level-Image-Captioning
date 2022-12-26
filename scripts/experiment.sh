@@ -1,0 +1,6 @@
+python3 predict_imgcap.py --batch_size 4 --model_path $1 --val_max_target_length 60 --num_beams 1 --repetition_penalty 1.2 --no_repeat_ngram_size 0 | tee Beam_1_rep_1.2_nongram_0.txt &&
+python3 predict_imgcap.py --batch_size 4 --model_path $1 --val_max_target_length 60 --num_beams 1 --repetition_penalty 1.0 --no_repeat_ngram_size 2 | tee Beam_1_rep_1.0_nongram_2.txt &&
+python3 predict_imgcap.py --batch_size 4 --model_path $1 --val_max_target_length 60 --num_beams 3 --repetition_penalty 1.0 --no_repeat_ngram_size 0 | tee Beam_3_rep_1.0_nongram_0.txt &&
+python3 predict_imgcap.py --batch_size 4 --model_path $1 --val_max_target_length 60 --num_beams 3 --repetition_penalty 1.2 --no_repeat_ngram_size 0 | tee Beam_3_rep_1.2_nongram_0.txt &&
+python3 predict_imgcap.py --batch_size 4 --model_path $1 --val_max_target_length 60 --num_beams 3 --repetition_penalty 1.0 --no_repeat_ngram_size 2 | tee Beam_3_rep_1.0_nongram_2.txt &&
+python3 predict_imgcap.py --batch_size 4 --model_path $1 --val_max_target_length 60 --num_beams 3 --repetition_penalty 1.2 --no_repeat_ngram_size 2 | tee Beam_1_rep_1.2_nongram_2.txt
