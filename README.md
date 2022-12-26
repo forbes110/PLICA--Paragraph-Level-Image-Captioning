@@ -15,7 +15,11 @@ bash scripts/download.sh
 ## 2. Training(or if you only need to eval/predict, skip this step)
 ```shell
 ## tune config in scripts/train.sh
-bash scripts/train.sh
+bash scripts/train.sh $output_model_path
 ```
-## Inferencing
+## 3. Inference and evaluate
+```shell
+## tune config in scripts/predict.sh
+bash scripts/predict.sh
+```
 

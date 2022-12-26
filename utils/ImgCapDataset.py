@@ -22,7 +22,7 @@ class ImgCapDataset(Dataset):
             },
         ]
     '''
-    def __init__(self, data):
+    def __init__(self, data, few_data_test=False):
 
         self.ids = []
         self.images = []
@@ -49,6 +49,11 @@ class ImgCapDataset(Dataset):
                 self.ids.append(row[id_name])
                 self.images.append(img)
                 self.captions.append(row[caption_name])
+
+        if few_data_test is True:
+            self.ids = self.ids[:100]
+            self.images = self.images[:100]
+            self.captions = self.captions[:100]
 
     def __len__(self):
         return len(self.images)

@@ -27,7 +27,7 @@ class ImgCapModel(nn.Module):
         self,
         use_pretrain_imgcap=False,
         encoder_name="google/vit-base-patch16-224-in21k",
-        decoder_name="bert-base-uncased",
+        decoder_name="gpt2",
     ):
 
         super().__init__()
@@ -37,10 +37,12 @@ class ImgCapModel(nn.Module):
             'cuda' if torch.cuda.is_available() else 'cpu')
         print("Using device: ", self.device)
 
+        self.use_pretrain_imgcap = use_pretrain_imgcap
+        self.encoder_name = encoder_name
+        self.decoder_name = decoder_name
+
         if use_pretrain_imgcap is False:
             " sub-tools "
-            # tokenizer for decoder
-            self.tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
             # visual extractor for encoder
             self.image_processor = ViTFeatureExtractor.from_pretrained(
                 encoder_name
@@ -49,8 +51,16 @@ class ImgCapModel(nn.Module):
             self.model = VisionEncoderDecoderModel.from_encoder_decoder_pretrained(
                 encoder_pretrained_model_name_or_path=encoder_name,
                 decoder_pretrained_model_name_or_path=decoder_name
-            ).to(self.device)
-            self.model.config.decoder_start_token_id = self.tokenizer.cls_token_id
+            )
+
+            # set tokenizer for decoder
+            if self.decoder_name == "gpt2":
+                self.tokenizer = GPT2TokenizerFast.from_pretrained(decoder_name)
+                self.tokenizer.pad_token = self.tokenizer.eos_token
+                self.model.config.decoder_start_token_id = self.tokenizer.bos_token_id
+            else:
+                self.tokenizer = BertTokenizer.from_pretrained(decoder_name)
+                self.model.config.decoder_start_token_id = self.tokenizer.cls_token_id
             self.model.config.pad_token_id = self.tokenizer.pad_token_id
         else:
             print("Using pretrain img-caption model...")
@@ -60,6 +70,8 @@ class ImgCapModel(nn.Module):
                 "nlpconnect/vit-gpt2-image-captioning")
             self.model = VisionEncoderDecoderModel.from_pretrained(
                 "nlpconnect/vit-gpt2-image-captioning")
+
+        self.model.to(self.device)
 
     def forward(self, image, caption=None):
 
@@ -86,16 +98,22 @@ class ImgCapModel(nn.Module):
         generated_text = self.tokenizer.batch_decode(
             generated_ids, skip_special_tokens=True)
 
+        generated_text = [text.replace("\n", "") for text in generated_text]
+
         return generated_text
 
     def save_model(self, model_path="model"):
         self.tokenizer.save_pretrained(model_path)
+        self.image_processor.save_pretrained(model_path)
         self.model.save_pretrained(model_path)
 
     def load_model(self, model_path):
-        self.model = VisionEncoderDecoderModel.from_pretrained(model_path)
-        self.tokenizer = BertTokenizer.from_pretrained(model_path)
+        if self.decoder_name == "gpt2":
+            self.tokenizer = GPT2TokenizerFast.from_pretrained(model_path)
+        else:
+            self.tokenizer = BertTokenizer.from_pretrained(model_path)
         self.image_processor = ViTFeatureExtractor.from_pretrained(model_path)
+        self.model = VisionEncoderDecoderModel.from_pretrained(model_path).to(self.device)
 
         self.model.config.decoder_start_token_id = self.tokenizer.cls_token_id
         self.model.config.pad_token_id = self.tokenizer.pad_token_id

@@ -130,7 +130,7 @@ def training(train_dataloader, valid_dataloader):
         save_preds(epoch, val_ids, pr_list)
 
         # save and check
-        model_path = os.path.join("test/", "model_{}".format(epoch + 1))
+        model_path = os.path.join("{}_{}".format(args.model_path, epoch + 1))
 
         model.save_model(model_path)
         print('Train Loss: {:3.6f} | Val Loss: {:3.6f}'.format(train_loss, 0,))
@@ -145,7 +145,7 @@ def main():
     raw_datasets = load_raw_datasets(args)
 
     " dataset and dataloader"
-    train_dataset = ImgCapDataset(raw_datasets["train"])
+    train_dataset = ImgCapDataset(raw_datasets["train"], args.few_data_test)
     print('train dataset format:')
     print(train_dataset)
     train_dataloader = DataLoader(
@@ -154,7 +154,7 @@ def main():
         collate_fn=train_dataset.collate_fn
     )
 
-    valid_dataset = ImgCapDataset(raw_datasets["valid"])
+    valid_dataset = ImgCapDataset(raw_datasets["valid"], args.few_data_test)
     print('valid dataset format:')
     print(valid_dataset)
     valid_dataloader = DataLoader(

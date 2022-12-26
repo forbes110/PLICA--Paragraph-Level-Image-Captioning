@@ -14,7 +14,7 @@ def parse_args() -> Namespace:
     ''' raw files '''
     parser.add_argument(
         "--raw_train_split", default='./data/raw/train_split.json', type=str
-    )    
+    )
     parser.add_argument(
         "--raw_valid_split", default='./data/raw/valid_split.json', type=str
     )
@@ -38,7 +38,10 @@ def parse_args() -> Namespace:
 
     ''' training configs '''
     parser.add_argument(
-        "--use_pretrain_imgcap", action="store_true", help="Using pretrained img caption model"
+        "--few_data_test", action="store_true", help="Sampling 100 data for testing correctness."
+    )
+    parser.add_argument(
+        "--use_pretrain_imgcap", action="store_true", help="Using pretrained img caption model."
     )
     parser.add_argument(
         "--batch_size", default=4, type=int
@@ -84,7 +87,10 @@ def parse_args() -> Namespace:
     )
     parser.add_argument("--num_warmup_steps", type=int, default=0)
 
-    '''output files'''
+    '''predict configs'''
+    parser.add_argument(
+        "--model_path", default=None, type=str
+    )
     parser.add_argument(
         "--val_max_target_length", default=60, type=int
     )
