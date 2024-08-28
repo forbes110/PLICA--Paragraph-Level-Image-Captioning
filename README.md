@@ -1,5 +1,7 @@
 # Paragraph-level-image-captioning
 
+Apply an end-to-end model structure (ViT + GPT) to describe images in more detail, rather than traditional image captioning that only provides object detections or a few simple sentences.
+
 detail: https://www.dropbox.com/scl/fi/ybvzpnkkcy7lnn9jbkkl1/report.pdf?rlkey=grunab2372z90x0uj429x2n5o&dl=1
 
 ## Environment Setup(default in download.sh)
