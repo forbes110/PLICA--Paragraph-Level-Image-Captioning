@@ -1,4 +1,5 @@
-# PLICA: Paragraph-level-image-captioning
+# PLEDGE: Paragraph LEvel image Description GEneration
+
 
 Apply an end-to-end model structure (ViT + GPT) to describe images in more detail, rather than traditional image captioning that only provides object detections or a few simple sentences.
 
