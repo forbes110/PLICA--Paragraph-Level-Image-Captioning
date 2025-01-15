@@ -3,7 +3,9 @@
 
 Apply an end-to-end model structure (ViT + GPT) to describe images in more detail, rather than traditional image captioning that only provides object detections or a few simple sentences.
 
-detail: https://www.dropbox.com/scl/fi/ybvzpnkkcy7lnn9jbkkl1/report.pdf?rlkey=grunab2372z90x0uj429x2n5o&dl=1
+detail: 
+- https://www.dropbox.com/scl/fi/ybvzpnkkcy7lnn9jbkkl1/report.pdf?rlkey=grunab2372z90x0uj429x2n5o&dl=1
+- https://app.readytensor.ai/publications/pledge-paragraph-level-image-description-generation-AFOdxdIzjcSr
 
 ## Environment Setup(default in download.sh)
 ```shell
